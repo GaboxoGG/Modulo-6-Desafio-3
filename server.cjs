@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
@@ -11,11 +13,11 @@ app.use(express.json());
 
 // Conexión a PostgreSQL
 const pool = new Pool({
-  host: "localhost",
-  user: "postgres",
-  password: "Chupeteo6$",
-  database: "likeme",
-  port: 5432,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
 });
 
 // Ruta de prueba
@@ -37,11 +39,11 @@ app.get("/posts", async (req, res) => {
 // Crear un nuevo post
 app.post("/posts", async (req, res) => {
   try {
-    const { titulo, img, descripcion, likes } = req.body;
+    const { titulo, url, descripcion } = req.body;
 
     const result = await pool.query(
       "INSERT INTO posts (titulo, img, descripcion, likes) VALUES ($1, $2, $3, $4) RETURNING *",
-      [titulo, img, descripcion, likes]
+      [titulo, url, descripcion, 0]
     );
 
     res.status(201).json(result.rows[0]);
